@@ -1,11 +1,13 @@
 import {Button, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
+import {Background} from '../components';
 
 export default function SplashScreen({navigation}) {
   return (
-    <View>
-      <Button title="Login" onPress={() => navigation.navigate('Login')} />
-      <Text>SplashScreen</Text>
+    <View style={{flex: 1}}>
+      <Background />
+      <Button title="Login" onPress={() => navigation.replace('Login')} />
+      <Text style={{color: 'white'}}>SplashScreen</Text>
     </View>
   );
 }

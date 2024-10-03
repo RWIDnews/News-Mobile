@@ -1,3 +1,6 @@
+import Background from './Background';
 import Gap from './Gap';
+import Quicknews from './Quicknews';
+import Logo from './Logo';
 
-export default Gap;
+export {Gap, Background, Quicknews, Logo};

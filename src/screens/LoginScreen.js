@@ -1,104 +1,379 @@
+// Import dependencies
+import React, {useState, useRef} from 'react';
 import {
-  StyleSheet,
+  View,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  Image,
+  StyleSheet,
+  Animated,
 } from 'react-native';
-import React, {useState} from 'react';
-import Gap from '../components';
-import CheckBox from '@react-native-community/checkbox';
+import {Background, Gap, Logo, Quicknews} from '../components';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function LoginScreen({navigation}) {
-  const [rememberMe, setRememberMe] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpandedSignUp, setIsExpandedSignUp] = useState(false);
+  const animatedValue = useRef(new Animated.Value(0)).current;
+
+  const [secure, setSecure] = useState(false);
+
+  // Function to trigger the expand animation
+  const handleSignInPress = () => {
+    setIsExpanded(true);
+    Animated.timing(animatedValue, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  // Function to trigger the close animation
+  const handleClosePress = () => {
+    Animated.timing(animatedValue, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: false,
+    }).start(() => {
+      setIsExpanded(false); // Reset the state after the animation completes
+    });
+  }; // Function to trigger the expand animation
+
+  const handleSignUpPress = () => {
+    setIsExpandedSignUp(true);
+    Animated.timing(animatedValue, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  // Function to trigger the close animation
+  const handleCloseSignUpPress = () => {
+    Animated.timing(animatedValue, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: false,
+    }).start(() => {
+      setIsExpandedSignUp(false); // Reset the state after the animation completes
+    });
+  };
+
+  const handleCloseSignInOpenSignUp = () => {
+    handleClosePress(), handleSignUpPress();
+  };
+
+  const handleCloseSignUpOpenSignIn = () => {
+    handleCloseSignUpPress(), handleSignInPress();
+  };
+
+  // Interpolating the animated values
+  const backgroundHeight = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['100%', '40%'], // Adjust as needed
+  });
+
+  const logoScale = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0.7], // Adjust to control how much the logo should shrink
+  });
+
+  const opacityInputFields = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1], // Fade in/out effect
+  });
 
   return (
-    <View style={{flex: 1}}>
-      <View
-        style={{
-          flex: 1,
-          margin: 20,
-          justifyContent: 'center',
-          alignContent: 'center',
-        }}>
-        <Text>LOGO HERE</Text>
-        <Gap height={50} />
-        <TextInput
-          style={{borderBottomColor: 'black', borderBottomWidth: 1}}
-          placeholder="Email"
-          placeholderTextColor={'grey'}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+    <View style={styles.container}>
+      {/* Background Image with Animated Height */}
+      <Animated.View
+        style={[styles.backgroundContainer, {height: backgroundHeight}]}>
+        <Background />
 
-        <Gap height={20} />
+        {/* Logo with scaling animation */}
+        <Animated.View
+          style={[styles.logoContainer, {transform: [{scale: logoScale}]}]}>
+          <Logo />
+          <Gap height={10} />
+          <Quicknews width={155} height={85} />
+        </Animated.View>
 
-        <TextInput
-          style={{borderBottomColor: 'black', borderBottomWidth: 1}}
-          placeholder="Password"
-          placeholderTextColor={'grey'}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <Gap height={20} />
-
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-          }}>
-          <CheckBox
-            onValueChange={() => setRememberMe(!rememberMe)}
-            value={rememberMe}
-            tintColor={{true: 'white', false: 'white'}}
-          />
-          <Text
-            onPress={() => setRememberMe(!rememberMe)}
-            style={{color: 'black', fontSize: 12}}>
-            Remember Me
-          </Text>
-        </View>
-
-        <Gap height={20} />
-
-        <TouchableOpacity
-          style={{justifyContent: 'center', alignSelf: 'center'}}
-          onPress={() => navigation.navigate('Home')}>
+        {/* Initial Sign In Button */}
+        {!isExpanded && (
           <View
             style={{
-              backgroundColor: 'aqua',
-              padding: 10,
-              width: 150,
-              alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: 20,
+              alignItems: 'center',
+              alignContent: 'center',
+              top: 500,
             }}>
-            <Text style={{color: 'black', fontWeight: '600'}}>Sign In</Text>
+            <TouchableOpacity
+              style={{
+                width: 320,
+                height: 45,
+                backgroundColor: '#F35F03',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 8,
+                elevation: 5,
+              }}
+              onPress={handleSignInPress}
+              activeOpacity={0.8}>
+              <Text style={styles.signInButtonText}>Sign In</Text>
+            </TouchableOpacity>
+            <Gap height={20} />
+            <TouchableOpacity>
+              <View
+                style={{
+                  width: 310,
+                  height: 45,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 8,
+                  elevation: 5,
+                  borderWidth: 1,
+                  borderColor: 'white',
+                }}>
+                <View style={{flexDirection: 'row'}}>
+                  <Image source={require('../assets/search2.png')} />
+                  <Gap width={10} />
+                  <Text
+                    style={{fontSize: 15, fontWeight: '600', color: 'white'}}>
+                    Sign Up with Google
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            <Gap height={10} />
+
+            <View style={{flexDirection: 'row'}}>
+              <Text style={{color: 'white'}}>Don't Have An Account?</Text>
+              <Gap width={5} />
+              <TouchableOpacity onPress={handleSignUpPress}>
+                <Text style={{color: '#037FF3'}}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </TouchableOpacity>
+        )}
+      </Animated.View>
 
-        <Gap height={20} />
-
-        <TouchableOpacity
-          style={{justifyContent: 'center', alignSelf: 'center'}}
-          onPress={() => navigation.navigate('Register')}>
-          <View
+      {/* Input Fields - will appear after animation */}
+      {isExpanded && (
+        <Animated.View
+          style={[styles.inputContainer, {opacity: opacityInputFields}]}>
+          <TouchableOpacity
             style={{
-              backgroundColor: 'tomato',
-              padding: 10,
-              width: 100,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 20,
-            }}>
-            <Text style={{color: 'black', fontWeight: '600'}}>Sign Up</Text>
+              width: 70,
+              height: 70,
+              alignSelf: 'center',
+            }}
+            onPress={handleClosePress}>
+            <View
+              style={{
+                backgroundColor: '#1E1E1E',
+                width: 70,
+                height: 70,
+                borderRadius: 70 / 2,
+                justifyContent: 'center',
+                alignItems: 'center',
+                elevation: 5,
+              }}>
+              <Icon name={'close'} color={'white'} size={40} />
+            </View>
+          </TouchableOpacity>
+
+          <Gap height={50} />
+
+          <View style={styles.inputWrapper}>
+            <Icon name={'gmail'} size={25} color={'#93949680'} />
+
+            <Gap width={10} />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your email"
+              placeholderTextColor="#666"
+            />
           </View>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.inputWrapper}>
+            <Icon name={'lock'} size={25} color={'#93949680'} />
+
+            <Gap width={10} />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your password"
+              placeholderTextColor="#666"
+              secureTextEntry={secure}
+            />
+            <TouchableOpacity onPress={() => setSecure(!secure)}>
+              <Icon
+                name={secure ? 'eye' : 'eye-off'}
+                size={25}
+                color={'#93949680'}
+              />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.signInButtonExpanded}
+            onPress={() => navigation.navigate('HomeTabs')}>
+            <Text style={styles.signInButtonText}>Sign In</Text>
+          </TouchableOpacity>
+
+          {/* Sign Up Link */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Don't have an account? </Text>
+            <TouchableOpacity onPress={handleCloseSignInOpenSignUp}>
+              <Text style={styles.signUpText}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      )}
+
+      {isExpandedSignUp && (
+        <Animated.View
+          style={[styles.inputContainer, {opacity: opacityInputFields}]}>
+          <TouchableOpacity
+            style={{
+              width: 70,
+              height: 70,
+              alignSelf: 'center',
+            }}
+            onPress={handleCloseSignUpPress}>
+            <View
+              style={{
+                backgroundColor: '#1E1E1E',
+                width: 70,
+                height: 70,
+                borderRadius: 70 / 2,
+                justifyContent: 'center',
+                alignItems: 'center',
+                elevation: 5,
+              }}>
+              <Icon name={'close'} color={'white'} size={40} />
+            </View>
+          </TouchableOpacity>
+
+          <Gap height={50} />
+
+          <View style={styles.inputWrapper}>
+            <Icon name={'account'} size={25} color={'#93949680'} />
+
+            <Gap width={10} />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your email"
+              placeholderTextColor="#666"
+            />
+          </View>
+
+          <View style={styles.inputWrapper}>
+            <Icon name={'gmail'} size={25} color={'#93949680'} />
+
+            <Gap width={10} />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your email"
+              placeholderTextColor="#666"
+            />
+          </View>
+
+          <View style={styles.inputWrapper}>
+            <Icon name={'lock'} size={25} color={'#93949680'} />
+
+            <Gap width={10} />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your password"
+              placeholderTextColor="#666"
+              secureTextEntry={secure}
+            />
+            <TouchableOpacity onPress={() => setSecure(!secure)}>
+              <Icon
+                name={secure ? 'eye' : 'eye-off'}
+                size={25}
+                color={'#93949680'}
+              />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.signInButtonExpanded}>
+            <Text style={styles.signInButtonText}>Create Account</Text>
+          </TouchableOpacity>
+
+          {/* Sign Up Link */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Already have and account? </Text>
+            <TouchableOpacity onPress={handleCloseSignUpOpenSignIn}>
+              <Text style={styles.signUpText}>Sign In</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({});
+// Styles
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#121212',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  backgroundContainer: {
+    width: '100%',
+    overflow: 'hidden',
+    zIndex: 1,
+    alignItems: 'center',
+  },
+  logoContainer: {
+    position: 'absolute',
+    top: '20%',
+    alignItems: 'center',
+  },
+  signInButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  inputContainer: {
+    width: '80%',
+  },
+  inputWrapper: {
+    backgroundColor: '#333',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  input: {
+    flex: 1,
+    color: '#fff',
+  },
+  signInButtonExpanded: {
+    backgroundColor: '#f77e22',
+    borderRadius: 8,
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  footerText: {
+    color: '#fff',
+  },
+  signUpText: {
+    color: '#f77e22',
+    fontWeight: 'bold',
+  },
+});

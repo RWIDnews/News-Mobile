@@ -1,10 +1,10 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 
-export default function MenuScreen() {
+export default function TrendingScreen() {
   return (
     <View>
-      <Text>MenuScreen</Text>
+      <Text>TrendingScreen</Text>
     </View>
   );
 }
