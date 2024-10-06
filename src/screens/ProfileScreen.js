@@ -3,8 +3,8 @@ import React from 'react';
 
 export default function ProfileScreen() {
   return (
-    <View>
-      <Text>ProfileScreen</Text>
+    <View style={{backgroundColor: '#272727', flex: 1}}>
+      <Text style={{color: 'white'}}>ProfileScreen</Text>
     </View>
   );
 }

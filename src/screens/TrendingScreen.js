@@ -3,8 +3,8 @@ import React from 'react';
 
 export default function TrendingScreen() {
   return (
-    <View>
-      <Text>TrendingScreen</Text>
+    <View style={{backgroundColor: '#272727', flex: 1}}>
+      <Text style={{color: 'white'}}>TrendingScreen</Text>
     </View>
   );
 }

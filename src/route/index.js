@@ -13,6 +13,18 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Stack Navigator for the details screens
+function DetailStackNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Details" component={DetailScreen} />
+      <Stack.Screen name="DetailsViral" component={DetailScreenViral} />
+    </Stack.Navigator>
+  );
+}
+
+// Bottom Tab Navigator including the Stack Navigator for the details
 function BottomTabNavigator() {
   return (
     <Tab.Navigator
@@ -20,7 +32,7 @@ function BottomTabNavigator() {
         tabBarIcon: ({focused, color, size}) => {
           let iconName;
 
-          if (route.name === 'Home') {
+          if (route.name === 'HomeStack') {
             iconName = focused ? 'home' : 'home';
           } else if (route.name === 'Favorite') {
             iconName = focused ? 'heart' : 'heart';
@@ -34,17 +46,19 @@ function BottomTabNavigator() {
         },
         headerShown: false,
         tabBarActiveTintColor: 'white',
-        tabBarInactiveTintColor: '#808080', // Grey color for inactive tabs
+        tabBarInactiveTintColor: '#808080',
         tabBarStyle: {
-          backgroundColor: '#2C2C2C', // Dark background for the bottom tab
-          height: 50, // Increase height to match the provided design
-          paddingBottom: 0, // Add space at the bottom for the icons
+          paddingHorizontal: 20,
+          backgroundColor: '#2C2C2C',
+          height: 50,
+          paddingBottom: 0,
         },
         tabBarLabelStyle: {
-          display: 'none', // Hide the text labels
+          display: 'none',
         },
       })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
+      {/* Tab for Home and its detail pages */}
+      <Tab.Screen name="HomeStack" component={DetailStackNavigator} />
       <Tab.Screen name="Favorite" component={FavoriteScreen} />
       <Tab.Screen name="Popular" component={TrendingScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
@@ -52,15 +66,14 @@ function BottomTabNavigator() {
   );
 }
 
+// Root Stack Navigator
 export default function Navigator() {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="HomeTabs" component={BottomTabNavigator} />
       <Stack.Screen name="Splash Screen" component={SplashScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="Details" component={DetailScreen} />
-      <Stack.Screen name="DetailsViral" component={DetailScreenViral} />
+      {/* Load Bottom Tab Navigator which contains the stack navigator */}
+      <Stack.Screen name="Main" component={BottomTabNavigator} />
     </Stack.Navigator>
   );
 }

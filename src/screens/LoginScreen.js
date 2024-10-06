@@ -1,5 +1,5 @@
 // Import dependencies
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, version} from 'react';
 import {
   View,
   Text,
@@ -80,8 +80,8 @@ export default function LoginScreen({navigation}) {
   });
 
   const opacityInputFields = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1], // Fade in/out effect
+    inputRange: [0, 2],
+    outputRange: [0, 2], // Fade in/out effect
   });
 
   return (
@@ -159,28 +159,33 @@ export default function LoginScreen({navigation}) {
         )}
       </Animated.View>
 
-      {/* Input Fields - will appear after animation */}
+      {/* Input Fields Sign In - will appear after animation */}
       {isExpanded && (
         <Animated.View
           style={[styles.inputContainer, {opacity: opacityInputFields}]}>
           <TouchableOpacity
             style={{
-              width: 70,
+              width: 100,
               height: 70,
               alignSelf: 'center',
             }}
             onPress={handleClosePress}>
             <View
               style={{
-                backgroundColor: '#1E1E1E',
-                width: 70,
-                height: 70,
-                borderRadius: 70 / 2,
                 justifyContent: 'center',
                 alignItems: 'center',
                 elevation: 5,
               }}>
-              <Icon name={'close'} color={'white'} size={40} />
+              <View
+                style={{
+                  backgroundColor: 'white',
+                  width: 80,
+                  height: 5,
+                  borderRadius: 40,
+                  marginVertical: 20,
+                }}
+              />
+              {/* <Icon name={'minus'} color={'white'} size={40} /> */}
             </View>
           </TouchableOpacity>
 
@@ -195,6 +200,8 @@ export default function LoginScreen({navigation}) {
               style={styles.input}
               placeholder="Enter your email"
               placeholderTextColor="#666"
+              autoCapitalize="none"
+              keyboardType="email-address"
             />
           </View>
           <View style={styles.inputWrapper}>
@@ -207,6 +214,7 @@ export default function LoginScreen({navigation}) {
               placeholder="Enter your password"
               placeholderTextColor="#666"
               secureTextEntry={secure}
+              autoCapitalize="none"
             />
             <TouchableOpacity onPress={() => setSecure(!secure)}>
               <Icon
@@ -218,7 +226,7 @@ export default function LoginScreen({navigation}) {
           </View>
           <TouchableOpacity
             style={styles.signInButtonExpanded}
-            onPress={() => navigation.navigate('HomeTabs')}>
+            onPress={() => navigation.navigate('Main')}>
             <Text style={styles.signInButtonText}>Sign In</Text>
           </TouchableOpacity>
 
@@ -232,27 +240,33 @@ export default function LoginScreen({navigation}) {
         </Animated.View>
       )}
 
+      {/* Input Fields Sign Up - will appear after animation */}
       {isExpandedSignUp && (
         <Animated.View
           style={[styles.inputContainer, {opacity: opacityInputFields}]}>
           <TouchableOpacity
             style={{
-              width: 70,
+              width: 100,
               height: 70,
               alignSelf: 'center',
             }}
             onPress={handleCloseSignUpPress}>
             <View
               style={{
-                backgroundColor: '#1E1E1E',
-                width: 70,
-                height: 70,
-                borderRadius: 70 / 2,
                 justifyContent: 'center',
                 alignItems: 'center',
                 elevation: 5,
               }}>
-              <Icon name={'close'} color={'white'} size={40} />
+              <View
+                style={{
+                  backgroundColor: 'white',
+                  width: 80,
+                  height: 5,
+                  borderRadius: 40,
+                  marginVertical: 20,
+                }}
+              />
+              {/* <Icon name={'minus'} color={'white'} size={40} /> */}
             </View>
           </TouchableOpacity>
 
@@ -322,9 +336,12 @@ export default function LoginScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#272727',
     alignItems: 'center',
     justifyContent: 'flex-start',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    // marginVertical: 20,
   },
   backgroundContainer: {
     width: '100%',
@@ -343,7 +360,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   inputContainer: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     width: '80%',
+    marginHorizontal: 20,
+    // backgroundColor: '',
   },
   inputWrapper: {
     backgroundColor: '#333',
