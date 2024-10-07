@@ -7,11 +7,41 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Gap, Quicknews} from '../components';
+import {AuthContext} from '../context/AuthContext';
+import axios from 'axios';
 
 export default function HomeScreen({navigation}) {
+  const {token, refreshToken} = useContext(AuthContext);
+  const [newsTest, setNewsTest] = useState([]);
+
+  const getNews = async () => {
+    try {
+      const response = await axios.get(
+        'https://sz0sw53s-3000.asse.devtunnels.ms/news',
+        {
+          refreshToken: refreshToken,
+          headers: {Authorization: `Bearer ${token}`},
+        },
+      );
+      setNewsTest(response.data.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error);
+      } else {
+        console.log(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getNews();
+  }, []);
+
+  console.log(newsTest);
+
   const data = [
     'News',
     'Edukasi',
@@ -129,11 +159,12 @@ export default function HomeScreen({navigation}) {
     <TouchableOpacity
       onPress={() => navigation.navigate('DetailsViral', {newsTrending: item})}>
       <View style={styles.viewTrendingNews}>
-        <Image source={{uri: item.image}} style={styles.imageTrending} />
+        <Image source={{uri: item.imageUrl}} style={styles.imageTrending} />
         <View style={styles.viewContainerTitleViral}>
           <View style={styles.viewTextTitleViral}>
             <Text style={styles.textTitleViral}>{item.title}</Text>
-            <Text style={styles.textTitleDecs}>{item.content}</Text>
+            <Gap height={5} />
+            <Text style={styles.textTitleDecs}>{item.shortDesc}</Text>
           </View>
         </View>
       </View>
@@ -144,24 +175,25 @@ export default function HomeScreen({navigation}) {
     <View>
       {/* header adn notification */}
       <View style={styles.viewHeader}>
-        <Quicknews width={100} height={55} />
+        <Quicknews width={75} height={35} />
         <TouchableOpacity>
-          <Icon name={'bell-outline'} color={'white'} size={50} />
+          <Icon name={'bell-outline'} color={'white'} size={30} />
         </TouchableOpacity>
       </View>
 
       {/* flatlist berita viral*/}
       <FlatList
         horizontal
-        data={newsTrending}
+        data={newsTest}
         renderItem={renderItemViral}
         keyExtractor={item => item.id.toString()}
+        showsHorizontalScrollIndicator={false}
       />
 
       <Gap height={20} />
 
       {/* scrolview categori */}
-      <ScrollView horizontal>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={{flexDirection: 'row'}}>
           {data.map((item, index) => (
             <TouchableOpacity key={index}>
@@ -214,6 +246,7 @@ const styles = StyleSheet.create({
     margin: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignContent: 'center',
   },
   textTitleDecs: {
     color: 'white',
@@ -221,7 +254,7 @@ const styles = StyleSheet.create({
   },
   textTitleViral: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   viewTextTitleViral: {

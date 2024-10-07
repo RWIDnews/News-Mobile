@@ -2,16 +2,19 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {Gap} from '../components';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {ScrollView} from 'react-native-gesture-handler';
 
 export default function DetailScreenViral({route, navigation}) {
   const news = route.params;
 
   const newsData = news.newsTrending;
 
+  console.log(newsData);
+
   return (
     <View style={{backgroundColor: '#252525', flex: 1}}>
       <Image
-        source={{uri: newsData.image}}
+        source={{uri: newsData.imageUrl}}
         style={{
           width: 420,
           height: 480,
@@ -40,19 +43,23 @@ export default function DetailScreenViral({route, navigation}) {
           borderRadius: 10,
         }}>
         <View style={{margin: 10}}>
-          <Text style={{color: 'white', fontSize: 20, fontWeight: '700'}}>
+          <Text style={{color: 'white', fontSize: 16, fontWeight: '700'}}>
             {newsData.title}
           </Text>
           <Text style={{color: 'white', fontWeight: '400'}}>
-            {newsData.content}
+            {newsData.shortDesc}
           </Text>
         </View>
       </View>
-      <View style={{marginTop: 60, marginHorizontal: 40}}>
-        <Text style={{color: 'white'}}>{newsData.source}</Text>
-        <Gap height={20} />
-        <Text style={{color: 'white'}}>{newsData.content}</Text>
-      </View>
+      <Gap height={40} />
+      <ScrollView>
+        <View style={{marginHorizontal: 40, flex: 1}}>
+          <Text style={{color: 'white'}}>{newsData.publishedAt}</Text>
+          <Gap height={20} />
+          <Text style={{color: 'white'}}>{newsData.description}</Text>
+          <Gap height={40} />
+        </View>
+      </ScrollView>
     </View>
   );
 }

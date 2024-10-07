@@ -5,7 +5,7 @@ export default function Quicknews({width, height}) {
   return (
     <Image
       source={require('../assets/Quicknews.png')}
-      style={{width: width, height: height}}
+      style={{width: width, height: height, resizeMode: 'contain'}}
     />
   );
 }

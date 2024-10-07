@@ -1,5 +1,5 @@
 // Import dependencies
-import React, {useState, useRef, version} from 'react';
+import React, {useState, useRef, useContext} from 'react';
 import {
   View,
   Text,
@@ -8,16 +8,94 @@ import {
   Image,
   StyleSheet,
   Animated,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {Background, Gap, Logo, Quicknews} from '../components';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import axios, {isAxiosError} from 'axios';
+import {AuthContext} from '../context/AuthContext';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 export default function LoginScreen({navigation}) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isExpandedSignUp, setIsExpandedSignUp] = useState(false);
   const animatedValue = useRef(new Animated.Value(0)).current;
 
-  const [secure, setSecure] = useState(false);
+  const [secure, setSecure] = useState(true);
+  const [secureReg, setSecureReg] = useState(true);
+
+  const {setToken, setRefreshToken} = useContext(AuthContext);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const submitLogin = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'https://sz0sw53s-3000.asse.devtunnels.ms/auth/login',
+        {email: email, password: password},
+      );
+      await EncryptedStorage.setItem(
+        'credentials',
+        JSON.stringify({email, password}),
+      );
+      const accessToken = response.data.accessToken;
+      const refreshToken = response.data.refreshToken;
+      setToken(accessToken);
+      setRefreshToken(refreshToken);
+      setLoading(false);
+      navigation.replace('Main');
+    } catch (error) {
+      setLoading(false);
+      if (isAxiosError(error)) {
+        console.log(error.response.data);
+      } else {
+        console.log(error);
+      }
+      Alert.alert(
+        'Gagal Login',
+        'Silahkan cek kembali Koneksi Internet, Email, dan Passwordnya. atau Daftar.',
+      );
+    }
+  };
+
+  const [regName, setRegName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [loadingReg, setLoadingReg] = useState(false);
+
+  const submitRegister = async () => {
+    setLoadingReg(true);
+    try {
+      const response = await axios.post(
+        'https://sz0sw53s-3000.asse.devtunnels.ms/auth/register',
+        {email: regEmail, password: regPassword, name: regName},
+      );
+      // await EncryptedStorage.setItem(
+      //   'credentials',
+      //   JSON.stringify({regEmail, regPassword}),
+      // );
+      const response1 = await axios.post(
+        'https://sz0sw53s-3000.asse.devtunnels.ms/auth/login',
+        {email: regEmail, password: regPassword},
+      );
+      const accessToken = response1.data.accessToken;
+      setToken(accessToken);
+      setLoadingReg(false);
+      // console.log(response.data);
+      // console.log(response1.data.accessToken);
+      navigation.replace('Main');
+    } catch (error) {
+      setLoadingReg(false);
+      Alert.alert(
+        'Gagal Register',
+        'Silahkan Cek Kembali email dan password anda',
+      );
+    }
+  };
 
   // Function to trigger the expand animation
   const handleSignInPress = () => {
@@ -94,52 +172,27 @@ export default function LoginScreen({navigation}) {
         {/* Logo with scaling animation */}
         <Animated.View
           style={[styles.logoContainer, {transform: [{scale: logoScale}]}]}>
-          <Logo />
+          <Logo width={166} height={166} />
           <Gap height={10} />
-          <Quicknews width={155} height={85} />
+          <Quicknews width={120} height={70} />
         </Animated.View>
 
         {/* Initial Sign In Button */}
         {!isExpanded && (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              alignContent: 'center',
-              top: 500,
-            }}>
+          <View style={styles.viewContainerBtn}>
             <TouchableOpacity
-              style={{
-                width: 320,
-                height: 45,
-                backgroundColor: '#F35F03',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 8,
-                elevation: 5,
-              }}
+              style={styles.btnSignIn}
               onPress={handleSignInPress}
               activeOpacity={0.8}>
               <Text style={styles.signInButtonText}>Sign In</Text>
             </TouchableOpacity>
             <Gap height={20} />
             <TouchableOpacity>
-              <View
-                style={{
-                  width: 310,
-                  height: 45,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 8,
-                  elevation: 5,
-                  borderWidth: 1,
-                  borderColor: 'white',
-                }}>
+              <View style={styles.btnGoogleSignIn}>
                 <View style={{flexDirection: 'row'}}>
                   <Image source={require('../assets/search2.png')} />
                   <Gap width={10} />
-                  <Text
-                    style={{fontSize: 15, fontWeight: '600', color: 'white'}}>
+                  <Text style={styles.textGoogleSignIn}>
                     Sign Up with Google
                   </Text>
                 </View>
@@ -163,28 +216,9 @@ export default function LoginScreen({navigation}) {
       {isExpanded && (
         <Animated.View
           style={[styles.inputContainer, {opacity: opacityInputFields}]}>
-          <TouchableOpacity
-            style={{
-              width: 100,
-              height: 70,
-              alignSelf: 'center',
-            }}
-            onPress={handleClosePress}>
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                elevation: 5,
-              }}>
-              <View
-                style={{
-                  backgroundColor: 'white',
-                  width: 80,
-                  height: 5,
-                  borderRadius: 40,
-                  marginVertical: 20,
-                }}
-              />
+          <TouchableOpacity style={styles.exitBtn} onPress={handleClosePress}>
+            <View style={styles.viewExitBtn}>
+              <View style={styles.viewExitBtnLine} />
               {/* <Icon name={'minus'} color={'white'} size={40} /> */}
             </View>
           </TouchableOpacity>
@@ -202,6 +236,7 @@ export default function LoginScreen({navigation}) {
               placeholderTextColor="#666"
               autoCapitalize="none"
               keyboardType="email-address"
+              onChangeText={email => setEmail(email)}
             />
           </View>
           <View style={styles.inputWrapper}>
@@ -215,6 +250,7 @@ export default function LoginScreen({navigation}) {
               placeholderTextColor="#666"
               secureTextEntry={secure}
               autoCapitalize="none"
+              onChangeText={password => setPassword(password)}
             />
             <TouchableOpacity onPress={() => setSecure(!secure)}>
               <Icon
@@ -226,8 +262,14 @@ export default function LoginScreen({navigation}) {
           </View>
           <TouchableOpacity
             style={styles.signInButtonExpanded}
-            onPress={() => navigation.navigate('Main')}>
-            <Text style={styles.signInButtonText}>Sign In</Text>
+            onPress={submitLogin}
+            // onPress={() => navigation.navigate('Main')}
+          >
+            {loading ? (
+              <ActivityIndicator color={'white'} size={'small'} />
+            ) : (
+              <Text style={styles.signInButtonText}>Sign In</Text>
+            )}
           </TouchableOpacity>
 
           {/* Sign Up Link */}
@@ -245,27 +287,10 @@ export default function LoginScreen({navigation}) {
         <Animated.View
           style={[styles.inputContainer, {opacity: opacityInputFields}]}>
           <TouchableOpacity
-            style={{
-              width: 100,
-              height: 70,
-              alignSelf: 'center',
-            }}
+            style={styles.exitBtn}
             onPress={handleCloseSignUpPress}>
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                elevation: 5,
-              }}>
-              <View
-                style={{
-                  backgroundColor: 'white',
-                  width: 80,
-                  height: 5,
-                  borderRadius: 40,
-                  marginVertical: 20,
-                }}
-              />
+            <View style={styles.viewExitBtn}>
+              <View style={styles.viewExitBtnLine} />
               {/* <Icon name={'minus'} color={'white'} size={40} /> */}
             </View>
           </TouchableOpacity>
@@ -279,8 +304,10 @@ export default function LoginScreen({navigation}) {
 
             <TextInput
               style={styles.input}
-              placeholder="Enter your email"
+              placeholder="Enter your Name"
               placeholderTextColor="#666"
+              autoCapitalize="words"
+              onChangeText={name => setRegName(name)}
             />
           </View>
 
@@ -291,8 +318,11 @@ export default function LoginScreen({navigation}) {
 
             <TextInput
               style={styles.input}
-              placeholder="Enter your email"
+              placeholder="Enter your Email"
               placeholderTextColor="#666"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onChangeText={email => setRegEmail(email)}
             />
           </View>
 
@@ -303,11 +333,13 @@ export default function LoginScreen({navigation}) {
 
             <TextInput
               style={styles.input}
-              placeholder="Enter your password"
+              placeholder="Enter your Password"
               placeholderTextColor="#666"
-              secureTextEntry={secure}
+              secureTextEntry={secureReg}
+              autoCapitalize="none"
+              onChangeText={password => setRegPassword(password)}
             />
-            <TouchableOpacity onPress={() => setSecure(!secure)}>
+            <TouchableOpacity onPress={() => setSecureReg(!secureReg)}>
               <Icon
                 name={secure ? 'eye' : 'eye-off'}
                 size={25}
@@ -315,8 +347,14 @@ export default function LoginScreen({navigation}) {
               />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.signInButtonExpanded}>
-            <Text style={styles.signInButtonText}>Create Account</Text>
+          <TouchableOpacity
+            style={styles.signInButtonExpanded}
+            onPress={submitRegister}>
+            {loadingReg ? (
+              <ActivityIndicator size={'small'} color={'white'} />
+            ) : (
+              <Text style={styles.signInButtonText}>Create Account</Text>
+            )}
           </TouchableOpacity>
 
           {/* Sign Up Link */}
@@ -334,6 +372,53 @@ export default function LoginScreen({navigation}) {
 
 // Styles
 const styles = StyleSheet.create({
+  viewExitBtnLine: {
+    backgroundColor: 'white',
+    width: 80,
+    height: 5,
+    borderRadius: 40,
+    marginVertical: 20,
+  },
+  viewExitBtn: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  exitBtn: {
+    width: 100,
+    height: 70,
+    alignSelf: 'center',
+  },
+  textGoogleSignIn: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: 'white',
+  },
+  btnGoogleSignIn: {
+    width: 310,
+    height: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'white',
+  },
+  btnSignIn: {
+    width: 320,
+    height: 45,
+    backgroundColor: '#F35F03',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 5,
+  },
+  viewContainerBtn: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignContent: 'center',
+    top: 500,
+  },
   container: {
     flex: 1,
     backgroundColor: '#272727',
